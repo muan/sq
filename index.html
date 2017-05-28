@@ -17,11 +17,11 @@
       <label for="choose-file" class="o-label fl mb3 db tc border-box bg-black white bn pa3 courier w-100">
         select file
       </label>
-      <a download="sq.png" class="o-save fl mb3 dn no-underline tc bg-green white bn pa3 courier w-50">save</a>
+      <a class="o-save fl mb3 dn no-underline tc bg-green white bn pa3 courier w-50" target="_blank" download>save</a>
       </div>
       <input type="file" id="choose-file" class="o-select-file w1 absolute outline-0">
       <canvas class="o-canvas relative bg-white b--silver w-100 border-box"></canvas>
-      <img class="o-image dn">
+      <img class="o-image dn relative ba b--silver w-100 border-box">
     </main>
 
     <script type="text/javascript">
@@ -31,29 +31,58 @@
       const label = document.querySelector('.o-label')
       const fileButton = document.querySelector('.o-select-file')
       const saveButton = document.querySelector('.o-save')
+      const limit = 4000
+      const supportDownload = !navigator.userAgent.match(/iPhone/)
 
+      function loadImage (url) {
+        imageObj.addEventListener('load', function() {
+          let dimension, offset, width, height
+          height = this.naturalHeight
+          width = this.naturalWidth
 
-      imageObj.addEventListener('load', function() {
-        const dimension = this.naturalWidth > this.naturalHeight ? this.naturalWidth : this.naturalHeight
-        const offset = this.naturalWidth > this.naturalHeight ? [0, dimension/4] : [dimension/4, 0]
+          if (width > limit || height > limit) {
+            scale = (width > height ? width : height) / 5000
+            dimension = dimension * scale
+            width = width * scale
+            height = height * scale
+          }
 
-        canvas.classList.add('ba')
-        canvas.width = dimension
-        canvas.height = dimension
-        ctx.fillStyle = 'white'
-        ctx.fillRect(0, 0, dimension, dimension)
-        ctx.drawImage(this, ...offset, this.naturalWidth, this.naturalHeight)
+          if (width > height) {
+            dimension = width
+            offset = [0, (dimension - height) / 2]
+          } else {
+            dimension = height
+            offset = [(dimension - width) / 2, 0]
+          }
 
-        saveButton.classList.add('db')
-        saveButton.href = canvas.toDataURL('image/octet-stream')
-      })
+          canvas.classList.add('ba')
+          canvas.width = dimension
+          canvas.height = dimension
+          ctx.fillStyle = 'white'
+          ctx.fillRect(0, 0, dimension, dimension)
+          ctx.drawImage(this, ...offset, width, height)
+
+          if (supportDownload) {
+            saveButton.classList.add('db')
+            saveButton.href = canvas.toDataURL('image/octet-stream')
+          } else {
+            canvas.classList.add('dn')
+            imageObj.classList.remove('dn')
+            imageObj.src = canvas.toDataURL('image/jpeg')
+          }
+        }, {once: true})
+
+        imageObj.src = url
+      }
 
       fileButton.addEventListener('change', function (evt) {
         const image = this.files[0]
         if (image) {
-          imageObj.src = URL.createObjectURL(image)
-          label.classList.add('w-50')
-          label.classList.remove('w-100')
+          loadImage(URL.createObjectURL(image))
+          if (supportDownload) {
+            label.classList.add('w-50')
+            label.classList.remove('w-100')
+          }
         }
       })
     </script>
