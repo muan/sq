@@ -16,7 +16,7 @@
       <label for="choose-file" class="o-label fl mb3 db tc border-box bg-black white bn pa3 courier w-100">
         select file
       </label>
-      <a class="o-save fl mb3 dn no-underline tc bg-green white bn pa3 courier w-50" target="_blank" download>save</a>
+      <a href="#" class="o-save fl mb3 dn no-underline tc bg-green white bn pa3 courier w-50" download>save</a>
       </div>
       <input type="file" id="choose-file" class="o-select-file w1 absolute outline-0" multiple="false" accept="image/*">
       <canvas class="o-canvas relative bg-white b--silver w-100 border-box"></canvas>
@@ -40,7 +40,7 @@
           width = this.naturalWidth
 
           if (width > limit || height > limit) {
-            scale = (width > height ? width : height) / 5000
+            scale = (width > height ? width : height) / limit
             dimension = dimension * scale
             width = width * scale
             height = height * scale
@@ -63,7 +63,7 @@
 
           if (supportDownload) {
             saveButton.classList.add('db')
-            saveButton.href = canvas.toDataURL('image/octet-stream')
+            saveButton.href = canvas.toDataURL('image/jpeg')
           } else {
             canvas.classList.add('dn')
             imageObj.classList.remove('dn')
@@ -77,11 +77,13 @@
       fileButton.addEventListener('change', function (evt) {
         const image = this.files[0]
         if (image) {
-          loadImage(URL.createObjectURL(image))
           if (supportDownload) {
+            URL.revokeObjectURL(saveButton.href)
             label.classList.add('w-50')
             label.classList.remove('w-100')
           }
+
+          loadImage(URL.createObjectURL(image))
         }
       })
     </script>
