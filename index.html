@@ -16,11 +16,11 @@
       <label for="choose-file" class="o-label fl mb3 db tc border-box bg-black white bn pa3 courier w-100">
         select file
       </label>
-      <a href="#" class="o-save fl mb3 dn no-underline tc bg-green white bn pa3 courier w-50" download>save</a>
+      <a href="#" class="o-save fl mb3 dn no-underline tc bg-green white bn pa3 courier w-50" download="sq.jpg">save</a>
       </div>
       <input type="file" id="choose-file" class="o-select-file w1 absolute outline-0" multiple="false" accept="image/*">
       <canvas class="o-canvas relative bg-white b--silver w-100 border-box"></canvas>
-      <img class="o-image dn relative ba b--silver w-100 border-box">
+      <img class="o-image dn relative ba b--silver w-100 border-box" alt="result">
     </main>
 
     <script type="text/javascript">
@@ -30,7 +30,7 @@
       const label = document.querySelector('.o-label')
       const fileButton = document.querySelector('.o-select-file')
       const saveButton = document.querySelector('.o-save')
-      const limit = 4000
+      const limit = 2800
       const supportDownload = !navigator.userAgent.match(/iPhone/)
 
       function loadImage (url) {
@@ -40,7 +40,7 @@
           width = this.naturalWidth
 
           if (width > limit || height > limit) {
-            scale = (width > height ? width : height) / limit
+            scale = limit / (width > height ? width : height)
             dimension = dimension * scale
             width = width * scale
             height = height * scale
