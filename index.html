@@ -13,29 +13,39 @@
   <body class="sans-serif ma0 pa0 f6">
     <main class="pa3 measure center">
       <div class="cf">
-      <label for="choose-file" class="o-label fl mb3 db tc border-box ba pa3 w-100">
+      <input type="file" id="choose-file" class="o-select-file w1 absolute outline-0" multiple="false" accept="image/*">
+      <label for="choose-file" class="o-label fl mb3 db tc border-box ba pa3 w-100 bg-white relative">
         Select file
       </label>
-      <a href="#" class="o-save fl mb3 dn no-underline tc border-box green ba pa3 sans-serif w-50" download="sq.jpg">Save</a>
+      <a href="#" class="o-save fl bb-0 dn no-underline tc border-box green ba pa3 sans-serif w-100" download="sq.jpg">Save</a>
       </div>
-      <input type="file" id="choose-file" class="o-select-file w1 absolute outline-0" multiple="false" accept="image/*">
-      <canvas class="o-canvas relative bg-white b--silver w-100 border-box"></canvas>
-      <img class="o-image dn relative ba b--silver w-100 border-box" alt="result">
+      <canvas class="o-canvas relative bg-white b--silver w-100 border-box mb3" hidden></canvas>
+      <img class="o-image dn relative ba b--silver w-100 border-box mb3" alt="result">
+      <div class="o-results"></div>
       <p class="o-no-download-message tc dn">Long press on the image to save.</p>
     </main>
 
     <script type="text/javascript">
-      const imageObj = document.querySelector('.o-image')
-      const canvas = document.querySelector('.o-canvas')
-      const ctx = canvas.getContext('2d')
+      const imageObjTemplate = document.querySelector('.o-image')
+      const canvasTemplate = document.querySelector('.o-canvas')
+      const saveButtonTemplate = document.querySelector('.o-save')
       const label = document.querySelector('.o-label')
+      const results = document.querySelector('.o-results')
       const fileButton = document.querySelector('.o-select-file')
-      const saveButton = document.querySelector('.o-save')
       const saveMessage = document.querySelector('.o-no-download-message')
       const limit = 2800
       const supportDownload = !navigator.userAgent.match(/iPhone/)
 
       function loadImage (url) {
+        const canvas = canvasTemplate.cloneNode()
+        const imageObj = imageObjTemplate.cloneNode()
+        const saveButton = saveButtonTemplate.cloneNode(true)
+        canvas.hidden = false
+        results.appendChild(saveButton)
+        results.appendChild(canvas)
+        results.appendChild(imageObj)
+        const ctx = canvas.getContext('2d')
+
         imageObj.addEventListener('load', function() {
           let dimension, offset, width, height
           height = this.naturalHeight
@@ -77,20 +87,16 @@
       }
 
       fileButton.addEventListener('change', function (evt) {
-        const image = this.files[0]
-        if (image) {
-          if (supportDownload) {
-            URL.revokeObjectURL(saveButton.href)
-            label.classList.add('w-50', 'br-0')
-            label.classList.remove('w-100')
-          } else {
-            saveMessage.classList.remove('dn')
-          }
-
+        for (const link of document.querySelectorAll('.o-results .o-save')) {
+          URL.revokeObjectURL(link.href)
+        }
+        results.innerHTML = ''
+        for(var i = 0; i < evt.currentTarget.files.length; i++) {
+          const image = evt.currentTarget.files[i]
+          if (!supportDownload) saveMessage.classList.remove('dn')
           loadImage(URL.createObjectURL(image))
         }
       })
     </script>
   </body>
 </html>
-
